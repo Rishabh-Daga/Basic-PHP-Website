@@ -1,7 +1,9 @@
 <?php
 
 $error = '';
-session_start();
+if(!isset($_SESSION)) { 
+    session_start(); 
+} 
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 $link = mysqli_connect("localhost", "root", "1234", "weswitch");

@@ -1,6 +1,6 @@
 <?php
 include('login.php');
-
+include('user_process.php');
 if(!isset($_SESSION['name'])) {
     header("location: signin.php");
 }
@@ -17,34 +17,46 @@ if(isset($_POST['logout'])){
 <title>My Home Page</title>
 </head>
 <body>
-<h1>Homepage : <?php echo $_SESSION['name']; ?> </h1>
-    <form method='post' action="logout.php">
-        <input type="submit" value="Logout" name="logout">
-    </form>
-    <form>
-        <textarea id="content" name="content" value="content"> </textarea>
-        <input type="submit" value="submit" name="submit">
-        <?php 
+    <h1>Homepage : <?php echo $_SESSION['name']; ?> </h1>
+    <div>
+        <form method='post' action="logout.php">
+            <input type="submit" value="Logout" name="logout">
+        </form>
+    </div>
+    <div>
+        <form method="post" action="user_process.php">
+            <textarea name="content" required="required"> </textarea>
+            <input type="submit" value="submit" name="submit">
+        </form>
+    </div>
 
-        $link = mysqli_connect("localhost", "root", "1234", "weswitch");
-        if(!$link){
-            die('Could not Connect My Sql:' .mysql_error());
-        }
+    <?php
+    $con=mysqli_connect("localhost","root","1234","weswitch");
+    // Check connection
+    if (mysqli_connect_errno()) {
+        echo "Failed to connect to MySQL: " . mysqli_connect_error();
+    }
+    $x = $_SESSION['name'];
+    $result = mysqli_query($con,"SELECT post as Blog, approved as Editor_Approval, published as Admin_Approval FROM content where username='$x'");
 
-        $text = mysqli_real_escape_string($link, $_REQUEST['content']);
-        $name = $_SESSION['name'];
+    echo "<table border='1'>
+    <tr>
+    <th>Post</th>
+    <th>Editor Approval</th>
+    <th>Admin Approval</th>
+    </tr>";
 
-        if(isset($_POST['submit']))
-        {	 
-            $sql = "INSERT INTO content (name, text, approved_by_editor, approved_by_admin) VALUES ('$name, '$text', 0, 0)";
-            if (mysqli_query($link, $sql)) {
-                echo "New blog created successfully !";
-            } else {
-                echo "Error: " . $sql . "" . mysqli_error($conn);
-            }
-        }
-        mysqli_close($conn);
-        ?>
-</div>
-</body>
+    while($row = mysqli_fetch_array($result)) {
+        echo "<tr>";
+        echo "<td>" . $row['Blog'] . "</td>";
+        echo "<td>" . $row['Editor_Approval'] . "</td>";
+        echo "<td>" . $row['Admin_Approval'] . "</td>";
+        echo "</tr>";
+    }
+    echo "</table>";
+
+    mysqli_close($con);
+    ?>
+    
+    </body>
 </hmtl>
